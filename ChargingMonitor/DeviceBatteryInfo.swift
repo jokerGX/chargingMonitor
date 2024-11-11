@@ -1,9 +1,10 @@
 // DeviceBatteryInfo.swift
 
 import Foundation
+import FirebaseFirestore
 
-struct DeviceBatteryInfo: Identifiable, Codable {
-    var id: String? // Firestore document ID
+struct DeviceBatteryInfo: Identifiable, Codable, Hashable {
+    var id: String? // Firestore Document ID
     var deviceID: String
     var deviceName: String
     var timestamp: Date

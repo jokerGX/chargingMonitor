@@ -6,77 +6,45 @@ struct DeviceRowView: View {
     var device: DeviceBatteryInfo
 
     var body: some View {
-        HStack {
+        HStack(spacing: 20) {
+            BatteryProgressView(batteryLevel: device.batteryLevel, isCharging: device.isCharging)
+
             VStack(alignment: .leading, spacing: 5) {
                 Text(device.deviceName)
                     .font(.headline)
                     .foregroundColor(.primary)
 
-                Text("Battery: \(Int(device.batteryLevel * 100))%")
+                Text("Battery Level: \(Int(device.batteryLevel * 100))%")
                     .font(.subheadline)
                     .foregroundColor(.secondary)
             }
 
             Spacer()
 
-            // Charging Status Indicator
+            // Charging Status Indicator with Animation
             HStack(spacing: 5) {
                 Image(systemName: device.isCharging ? "bolt.fill" : "bolt.slash.fill")
                     .foregroundColor(device.isCharging ? .green : .red)
+                    .scaleEffect(device.isCharging ? 1.2 : 1.0)
+                    .animation(.easeInOut(duration: 0.3), value: device.isCharging)
 
                 Text(device.isCharging ? "Charging" : "Not Charging")
                     .font(.subheadline)
                     .foregroundColor(device.isCharging ? .green : .red)
+                    .transition(.opacity)
             }
-            .padding(.trailing, 10)
 
-            // Thermal State Indicator
-            HStack(spacing: 5) {
-                Image(systemName: thermalStateIcon(state: device.thermalState))
-                    .foregroundColor(thermalStateColor(state: device.thermalState))
-
-                Text(device.thermalState.capitalized)
-                    .font(.subheadline)
-                    .foregroundColor(thermalStateColor(state: device.thermalState))
-            }
+            // Thermal State Badge
+            ThermalStateBadge(state: device.thermalState)
         }
         .padding()
         .background(
-            RoundedRectangle(cornerRadius: 10)
+            RoundedRectangle(cornerRadius: 15)
                 .fill(Color(NSColor.windowBackgroundColor))
-                .shadow(color: Color.black.opacity(0.1), radius: 2, x: 0, y: 2)
+                .shadow(color: Color.black.opacity(0.1), radius: 4, x: 0, y: 2)
         )
-    }
-
-    // Helper Functions
-    private func thermalStateIcon(state: String) -> String {
-        switch state.lowercased() {
-        case "nominal":
-            return "thermometer"
-        case "fair":
-            return "thermometer.sun.fill"
-        case "serious":
-            return "thermometer.medium"
-        case "critical":
-            return "thermometer.snowflake"
-        default:
-            return "questionmark"
-        }
-    }
-
-    private func thermalStateColor(state: String) -> Color {
-        switch state.lowercased() {
-        case "nominal":
-            return .green
-        case "fair":
-            return .yellow
-        case "serious":
-            return .orange
-        case "critical":
-            return .red
-        default:
-            return .gray
-        }
+        .padding(.horizontal)
+        .animation(.easeInOut, value: device.batteryLevel)
     }
 }
 
@@ -84,8 +52,8 @@ struct DeviceRowView_Previews: PreviewProvider {
     static var previews: some View {
         DeviceRowView(device: DeviceBatteryInfo(
             id: "123e4567-e89b-12d3-a456-426614174000",
-            deviceID: "123e4567-e89b-12d3-a456-426614174000",
-            deviceName: "GX",
+            deviceID: "19C4F7F2-AA06-4298-93A5-18923643C766",
+            deviceName: "iPhone",
             timestamp: Date(),
             batteryLevel: 0.85,
             isCharging: true,
